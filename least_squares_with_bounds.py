@@ -1,12 +1,10 @@
 # The goal of this program is to find the best x that best satisfies the equation ax = b given certain constraints on x (e.g., that x-values can only be in certain ranges).
 
-from numpy import dot, reshape, sum, min, max, array
-from numpy.random import normal, seed, random
+from numpy import dot, reshape, sum, array
+from numpy.random import random, normal
 from scipy.optimize import minimize
 from pyds import (
     flatten,
-    rScore,
-    apply,
     isATensor,
     containsOnlyNumbers,
     isAPandasDataFrame,
@@ -20,7 +18,7 @@ def randomInRange(rmin, rmax):
     return random() * (rmax - rmin) + rmin
 
 
-def leastSquaresWithBounds(a, b, bounds):
+def leastSquaresWithBounds(a, b, bounds=None):
     aErrorMessage = "`a` must be a tensor that contains only numbers!"
     bErrorMessage = "`b` must be a tensor that contains only numbers!"
 
@@ -41,34 +39,39 @@ def leastSquaresWithBounds(a, b, bounds):
     if not isANumpyArray(b):
         b = array(b)
 
-    tupleType = type((2, 3, 4))
-    boundsErrorMessage = "`bounds` must be a one-dimensional array of tuples where each tuple is a pair of minimum and maximum values!"
+    if bounds is not None:
+        tupleType = type((2, 3, 4))
+        boundsErrorMessage = "`bounds` must be a one-dimensional array of tuples where each tuple is a pair of minimum and maximum values!"
 
-    assert isIterable(bounds), boundsErrorMessage
+        assert isIterable(bounds), boundsErrorMessage
 
-    for item in bounds:
-        assert type(item) == tupleType, boundsErrorMessage
-        assert len(item) == 2, boundsErrorMessage
+        for item in bounds:
+            assert type(item) == tupleType, boundsErrorMessage
+            assert len(item) == 2, boundsErrorMessage
 
     xShape = [a.shape[1], b.shape[1]]
     objective = lambda xFlat: sum((b - dot(a, reshape(xFlat, xShape))) ** 2)
     gradient = lambda xFlat: flatten(-2 * dot(a.T, b - dot(a, reshape(xFlat, xShape))))
 
     # set up xInit to fall within bounds
-    xInit = []
+    if bounds is not None:
+        xInit = []
 
-    for i in range(0, xShape[0]):
-        row = []
+        for i in range(0, xShape[0]):
+            row = []
 
-        for j in range(0, xShape[1]):
-            pair = bounds[i * xShape[1] + j]
-            pmin = pair[0]
-            pmax = pair[1]
-            row.append(randomInRange(pmin, pmax))
+            for j in range(0, xShape[1]):
+                pair = bounds[i * xShape[1] + j]
+                pmin = pair[0]
+                pmax = pair[1]
+                row.append(randomInRange(pmin, pmax))
 
-        xInit.append(row)
+            xInit.append(row)
 
-    xInit = array(xInit)
+        xInit = array(xInit)
+
+    else:
+        xInit = normal(size=xShape)
 
     results = minimize(
         objective,
@@ -101,18 +104,3 @@ def leastSquaresWithBounds(a, b, bounds):
     )
 
     return reshape(results.x, xShape)
-
-
-if __name__ == "__main__":
-    seed(12345)
-    a = normal(size=[100, 50])
-    x = normal(size=[50, 25])
-    b = dot(a, x)
-    b += 0.01 * normal(size=b.shape)
-    bounds = [(-1, 1) for i in range(0, len(flatten(x)))]
-
-    xPred = leastSquaresWithBounds(a, b, bounds)
-
-    print("r-score:", rScore(x, xPred))
-    print("min:", min(xPred))
-    print("max:", max(xPred))
