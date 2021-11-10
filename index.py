@@ -1,9 +1,8 @@
 # The goal of this program is to find the best x that best satisfies the equation ax = b given certain constraints on x (e.g., that x-values can only be in certain ranges).
 
 from numpy import dot, reshape, sum, min, max
-from numpy.random import normal
+from numpy.random import normal, seed
 from scipy.optimize import minimize
-from autograd import grad
 from pyds import flatten, rScore, apply
 
 
@@ -15,13 +14,22 @@ def getObjective(a, x, b):
     return objective
 
 
-a = normal(size=[10, 7])
-x = normal(size=[7, 5])
+def getGradient(a, x, b):
+    def gradient(xFlat):
+        xTemp = reshape(xFlat, x.shape)
+        return flatten(-2 * dot(a.T, b - dot(a, xTemp)))
+
+    return gradient
+
+
+seed(12345)
+a = normal(size=[100, 50])
+x = normal(size=[50, 25])
 b = dot(a, x)
 b += 0.01 * normal(size=b.shape)
 
 objective = getObjective(a, x, b)
-gradient = grad(objective)
+gradient = getGradient(a, x, b)
 xInit = normal(size=x.shape)
 bounds = [(-1, 1) for i in range(0, len(flatten(x)))]
 
