@@ -48,6 +48,10 @@ def leastSquaresWithBounds(a, b, bounds=None):
         for item in bounds:
             assert type(item) == tupleType, boundsErrorMessage
             assert len(item) == 2, boundsErrorMessage
+            assert containsOnlyNumbers(item), boundsErrorMessage
+            assert (
+                item[0] <= item[1]
+            ), "Each `bounds` tuple must be in the form `(min, max)`!"
 
     xShape = [a.shape[1], b.shape[1]]
     objective = lambda xFlat: sum((b - dot(a, reshape(xFlat, xShape))) ** 2)
