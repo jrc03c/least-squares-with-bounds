@@ -3,7 +3,17 @@
 from numpy import dot, reshape, sum, min, max, array
 from numpy.random import normal, seed, random
 from scipy.optimize import minimize
-from pyds import flatten, rScore, apply
+from pyds import (
+    flatten,
+    rScore,
+    apply,
+    isATensor,
+    containsOnlyNumbers,
+    isAPandasDataFrame,
+    isAPandasSeries,
+    isANumpyArray,
+    isIterable,
+)
 
 
 def randomInRange(rmin, rmax):
@@ -11,6 +21,35 @@ def randomInRange(rmin, rmax):
 
 
 def leastSquaresWithBounds(a, b, bounds):
+    aErrorMessage = "`a` must be a tensor that contains only numbers!"
+    bErrorMessage = "`b` must be a tensor that contains only numbers!"
+
+    assert isATensor(a), aErrorMessage
+    assert containsOnlyNumbers(a), aErrorMessage
+    assert isATensor(b), bErrorMessage
+    assert containsOnlyNumbers(b), bErrorMessage
+
+    if isAPandasDataFrame(a):
+        a = a.values
+
+    if not isANumpyArray(a):
+        a = array(a)
+
+    if isAPandasDataFrame(b):
+        b = b.values
+
+    if not isANumpyArray(b):
+        b = array(b)
+
+    tupleType = type((2, 3, 4))
+    boundsErrorMessage = "`bounds` must be a one-dimensional array of tuples where each tuple is a pair of minimum and maximum values!"
+
+    assert isIterable(bounds), boundsErrorMessage
+
+    for item in bounds:
+        assert type(item) == tupleType, boundsErrorMessage
+        assert len(item) == 2, boundsErrorMessage
+
     xShape = [a.shape[1], b.shape[1]]
     objective = lambda xFlat: sum((b - dot(a, reshape(xFlat, xShape))) ** 2)
     gradient = lambda xFlat: flatten(-2 * dot(a.T, b - dot(a, reshape(xFlat, xShape))))
