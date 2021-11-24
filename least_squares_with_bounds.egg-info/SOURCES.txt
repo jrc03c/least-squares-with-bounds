@@ -1,0 +1,9 @@
+.gitignore
+README.md
+setup.py
+least_squares_with_bounds/__init__.py
+least_squares_with_bounds.egg-info/PKG-INFO
+least_squares_with_bounds.egg-info/SOURCES.txt
+least_squares_with_bounds.egg-info/dependency_links.txt
+least_squares_with_bounds.egg-info/requires.txt
+least_squares_with_bounds.egg-info/top_level.txt

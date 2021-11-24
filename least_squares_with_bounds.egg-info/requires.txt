@@ -1,0 +1,3 @@
+numpy
+scipy
+pyds@ git+https://github.com/jrc03c/pyds
