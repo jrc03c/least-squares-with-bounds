@@ -6,7 +6,9 @@ from pyds import flatten, leastSquares, rScore, map, apply
 
 
 class LeastSquaresWithBoundsTestCase(unittest.TestCase):
-    def testMinimize(self):
+    # test that running the `leastSquaresWithoutBounds` function yields the same
+    # results as simply running `leastSquares`
+    def testWithoutBounds(self):
         a = normal(size=[100, 75])
         x = normal(size=[75, 50])
         b = dot(a, x)
@@ -16,15 +18,7 @@ class LeastSquaresWithBoundsTestCase(unittest.TestCase):
         xPred2 = leastSquaresWithBounds(a, b)
         self.assertGreater(rScore(xPred1, xPred2), 0.99)
 
-    def testWithoutBounds(self):
-        a = normal(size=[100, 50])
-        x = normal(size=[50, 25])
-        b = dot(a, x)
-        b += 0.01 * normal(size=b.shape)
-
-        xPred = leastSquaresWithBounds(a, b, bounds=None)
-        self.assertGreater(rScore(x, xPred), 0.95)
-
+    # test that bounds are obeyed when given
     def testWithBounds(self):
         a = normal(size=[100, 50])
         x = normal(size=[50, 25])
@@ -37,15 +31,18 @@ class LeastSquaresWithBoundsTestCase(unittest.TestCase):
         self.assertGreaterEqual(min(xPred), 0)
         self.assertLessEqual(max(xPred), 1)
 
+    # test that errors are thrown when using wrong kinds of data
     def testErrors(self):
         a = normal(size=[10, 10])
         b = normal(size=[10, 10])
         aMissing = apply(lambda x: None if random() < 0.1 else x, a)
         bMissing = apply(lambda x: None if random() < 0.1 else x, b)
         bounds = [(0, 1) for i in range(0, 100)]
+
         boundsWrong1 = map(
             lambda pair: (pair[1], pair[0]) if random() < 0.1 else pair, bounds
         )
+
         boundsWrong2 = map(lambda pair: "foo" if random() < 0.1 else pair, bounds)
         boundsWrong3 = reshape(bounds, [10, 10, 2])
 
