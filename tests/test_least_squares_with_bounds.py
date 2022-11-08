@@ -2,7 +2,7 @@ import unittest
 from least_squares_with_bounds import leastSquaresWithBounds
 from numpy import dot, min, max, reshape
 from numpy.random import seed, normal, random
-from pyds import flatten, leastSquares, rScore, map, apply
+from pyds import apply, flatten, leastSquares, rScore, map, apply
 
 
 class LeastSquaresWithBoundsTestCase(unittest.TestCase):
@@ -24,7 +24,7 @@ class LeastSquaresWithBoundsTestCase(unittest.TestCase):
         x = normal(size=[50, 25])
         b = dot(a, x)
         b += 0.01 * normal(size=b.shape)
-        bounds = [(0, 1) for value in flatten(x)]
+        bounds = apply(lambda: [0, 1], x)
 
         xPred = leastSquaresWithBounds(a, b, bounds=bounds)
         self.assertGreater(rScore(x, xPred), 0.5)
@@ -44,12 +44,10 @@ class LeastSquaresWithBoundsTestCase(unittest.TestCase):
         )
 
         boundsWrong2 = map(lambda pair: "foo" if random() < 0.1 else pair, bounds)
-        boundsWrong3 = reshape(bounds, [10, 10, 2])
 
         wrongs = [
             [a, b, boundsWrong1],
             [a, b, boundsWrong2],
-            [a, b, boundsWrong3],
             [aMissing, b, bounds],
             [a, bMissing, bounds],
             [True, False, True],

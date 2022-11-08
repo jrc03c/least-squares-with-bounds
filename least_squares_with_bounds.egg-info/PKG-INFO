@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: least-squares-with-bounds
-Version: 0.0.1
+Version: 0.0.2
 Summary: just a little wrapper around scipy.optimize.minimize
 Home-page: https://github.com/jrc03c/least-squares-with-bounds
 Author: jrc03c

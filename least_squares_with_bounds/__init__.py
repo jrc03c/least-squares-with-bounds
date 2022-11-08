@@ -20,6 +20,11 @@ def randomInRange(rmin, rmax):
     return random() * (rmax - rmin) + rmin
 
 
+def flattenToTuples(x):
+    xFlat = flatten(x)
+    return reshape(xFlat, [int(len(xFlat) / 2), 2])
+
+
 def leastSquaresWithBounds(a, b, bounds=None):
     aErrorMessage = "`a` must be a tensor that contains only numbers!"
     bErrorMessage = "`b` must be a tensor that contains only numbers!"
@@ -42,13 +47,12 @@ def leastSquaresWithBounds(a, b, bounds=None):
         b = array(b)
 
     if bounds is not None:
-        tupleType = type((2, 3, 4))
         boundsErrorMessage = "`bounds` must be a one-dimensional array of tuples where each tuple is a pair of minimum and maximum values!"
 
         assert isIterable(bounds), boundsErrorMessage
+        bounds = flattenToTuples(bounds)
 
         for item in bounds:
-            assert type(item) == tupleType, boundsErrorMessage
             assert len(item) == 2, boundsErrorMessage
             assert containsOnlyNumbers(item), boundsErrorMessage
 
@@ -82,18 +86,10 @@ def leastSquaresWithBounds(a, b, bounds=None):
     else:
         xInit = []
 
-        for i in range(0, xShape[0]):
-            row = []
+        for bound in bounds:
+            xInit.append(randomInRange(bound[0], bound[1]))
 
-            for j in range(0, xShape[1]):
-                pair = bounds[i * xShape[1] + j]
-                pmin = pair[0]
-                pmax = pair[1]
-                row.append(randomInRange(pmin, pmax))
-
-            xInit.append(row)
-
-        xInit = array(xInit)
+        xInit = reshape(xInit, xShape)
 
     results = minimize(
         objective,
