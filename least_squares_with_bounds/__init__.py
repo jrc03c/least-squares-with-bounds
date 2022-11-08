@@ -3,6 +3,7 @@
 from numpy import dot, reshape, sum, array
 from numpy.random import random, normal
 from scipy.optimize import minimize
+
 from pyds import (
     flatten,
     isATensor,
@@ -11,6 +12,7 @@ from pyds import (
     isAPandasSeries,
     isANumpyArray,
     isIterable,
+    leastSquares,
 )
 
 
@@ -49,16 +51,35 @@ def leastSquaresWithBounds(a, b, bounds=None):
             assert type(item) == tupleType, boundsErrorMessage
             assert len(item) == 2, boundsErrorMessage
             assert containsOnlyNumbers(item), boundsErrorMessage
+
             assert (
                 item[0] <= item[1]
             ), "Each `bounds` tuple must be in the form `(min, max)`!"
 
     xShape = [a.shape[1], b.shape[1]]
-    objective = lambda xFlat: sum((b - dot(a, reshape(xFlat, xShape))) ** 2)
-    gradient = lambda xFlat: flatten(-2 * dot(a.T, b - dot(a, reshape(xFlat, xShape))))
 
-    # set up xInit to fall within bounds
-    if bounds is not None:
+    # ax = b
+    # objective = sum((ax - b)^2)
+    def objective(xFlat):
+        return sum((dot(a, reshape(xFlat, xShape)) - b) ** 2)
+
+    # gradient = d/d_x of objective
+    # = d/d_x of sum((ax - b)^2)
+    # = 2 * a * (ax - b)
+    def gradient(xFlat):
+        return flatten(2 * dot(a.T, (dot(a, reshape(xFlat, xShape)) - b)))
+
+    if bounds is None:
+        # reallistically speaking, if there are no bounds, then we should just return
+        # OLS(a, b); i.e.:
+        # x = leastSquares(a, b)
+        # return x
+
+        # if there are no bounds, xInit is random (?)
+        xInit = normal(size=xShape)
+
+    # otherwise, set up xInit to fall within bounds
+    else:
         xInit = []
 
         for i in range(0, xShape[0]):
@@ -73,9 +94,6 @@ def leastSquaresWithBounds(a, b, bounds=None):
             xInit.append(row)
 
         xInit = array(xInit)
-
-    else:
-        xInit = normal(size=xShape)
 
     results = minimize(
         objective,
@@ -108,3 +126,4 @@ def leastSquaresWithBounds(a, b, bounds=None):
     )
 
     return reshape(results.x, xShape)
+

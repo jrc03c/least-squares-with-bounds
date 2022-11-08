@@ -6,6 +6,9 @@ from pyds import flatten, rScore, map, apply
 
 
 class LeastSquaresWithBoundsTestCase(unittest.TestCase):
+    def testMinimize(self):
+        pass
+
     def testWithoutBounds(self):
         a = normal(size=[100, 50])
         x = normal(size=[50, 25])
