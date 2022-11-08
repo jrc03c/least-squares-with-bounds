@@ -48,7 +48,7 @@ from numpy.random import normal
 a = normal(size=[100, 75])
 xTrue = normal(size=[75, 50])
 
-# compute `b`, the dot product of `a` and `x` (plus a little bit of noise)
+# compute `b`, the dot product of `a` and `x` (plus a little noise)
 b = dot(a, xTrue)
 b += 1e-5 * normal(size=b.shape)
 

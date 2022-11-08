@@ -73,14 +73,9 @@ def leastSquaresWithBounds(a, b, bounds=None):
     def gradient(xFlat):
         return flatten(2 * dot(a.T, (dot(a, reshape(xFlat, xShape)) - b)))
 
+    # if there are no bounds, then just return OLS(a, b)
     if bounds is None:
-        # reallistically speaking, if there are no bounds, then we should just return
-        # OLS(a, b); i.e.:
-        # x = leastSquares(a, b)
-        # return x
-
-        # if there are no bounds, xInit is random (?)
-        xInit = normal(size=xShape)
+        return leastSquares(a, b)
 
     # otherwise, set up xInit to fall within bounds
     else:
