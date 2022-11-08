@@ -2,12 +2,19 @@ import unittest
 from least_squares_with_bounds import leastSquaresWithBounds
 from numpy import dot, min, max, reshape
 from numpy.random import seed, normal, random
-from pyds import flatten, rScore, map, apply
+from pyds import flatten, leastSquares, rScore, map, apply
 
 
 class LeastSquaresWithBoundsTestCase(unittest.TestCase):
     def testMinimize(self):
-        pass
+        a = normal(size=[100, 75])
+        x = normal(size=[75, 50])
+        b = dot(a, x)
+        b += 1e-5 * normal(size=b.shape)
+
+        xPred1 = leastSquares(a, b)
+        xPred2 = leastSquaresWithBounds(a, b)
+        self.assertGreater(rScore(xPred1, xPred2), 0.99)
 
     def testWithoutBounds(self):
         a = normal(size=[100, 50])
