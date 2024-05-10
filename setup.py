@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="least_squares_with_bounds",
-    version="0.0.4",
+    version="0.0.5",
     description="just a little wrapper around scipy.optimize.minimize",
     url="https://github.com/jrc03c/least-squares-with-bounds",
     author="jrc03c",

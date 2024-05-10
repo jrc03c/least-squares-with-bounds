@@ -2,6 +2,12 @@
 README.md
 setup.py
 least_squares_with_bounds/__init__.py
+least_squares_with_bounds/flatten_to_tuples.py
+least_squares_with_bounds/flatten_to_tuples_test.py
+least_squares_with_bounds/least_squares_with_bounds.py
+least_squares_with_bounds/least_squares_with_bounds_test.py
+least_squares_with_bounds/random_in_range.py
+least_squares_with_bounds/random_in_range_test.py
 least_squares_with_bounds.egg-info/PKG-INFO
 least_squares_with_bounds.egg-info/SOURCES.txt
 least_squares_with_bounds.egg-info/dependency_links.txt

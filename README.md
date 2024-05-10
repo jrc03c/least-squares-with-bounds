@@ -20,18 +20,18 @@ pip install -U git+https://github.com/jrc03c/least-squares-with-bounds
 # Usage
 
 ```py
-from least_squares_with_bounds import leastSquaresWithBounds
+from least_squares_with_bounds import least_squares_with_bounds
 
 a = ...
 b = ...
 bounds = ...
 
-x = leastSquaresWithBounds(a, b, bounds)
+x = least_squares_with_bounds(a, b, bounds)
 ```
 
 # API
 
-## `leastSquaresWithBounds(a, b, bounds=None)`
+## `least_squares_with_bounds(a, b, bounds=None)`
 
 Assuming an equation of the form $ax = b$, this function will solve for $x$ given $a$, $b$, and an array of bounds on $x$. The `bounds` parameter can either be in the shape that $x$ should be in (but where each value is a tuple rather than a single number), or it can be a 1-dimensional array of tuples.
 
@@ -40,37 +40,40 @@ Assuming an equation of the form $ax = b$, this function will solve for $x$ give
 Here's a fuller example that forces the values of $x$ to fall in the range $[0, 1]$ and then confirms that that is in fact the case. (I'm sure there are more Pythonic ways of doing things than what I've done below, so please pardon my ignorance!)
 
 ```py
-from least_squares_with_bounds import leastSquaresWithBounds
+from least_squares_with_bounds import least_squares_with_bounds
 from numpy import dot, max, min
 from numpy.random import normal
 
 # generate `a` and `x`
 a = normal(size=[100, 75])
-xTrue = normal(size=[75, 50])
+x_true = normal(size=[75, 50])
 
 # compute `b`, the dot product of `a` and `x` (plus a little noise)
-b = dot(a, xTrue)
+b = dot(a, x_true)
 b += 1e-5 * normal(size=b.shape)
 
 # define bounds for `x`
 bounds = []
 
-for i in range(0, xTrue.shape[0]):
+for i in range(0, x_true.shape[0]):
     row = []
 
-    for j in range(0, xTrue.shape[1]):
+    for j in range(0, x_true.shape[1]):
         bound = [0, 1]
         row.append(bound)
 
     bounds.append(row)
 
 # solve for `x`
-xPred = leastSquaresWithBounds(a, b, bounds)
+x_pred = least_squares_with_bounds(a, b, bounds)
 
 # confirm that `x` falls within the specified bounds
-xPredMin = min(xPred)
-xPredMax = max(xPred)
-assert xPredMin >= 0, "Uh-oh! The lowest value in xPred is %.4f!" % (xPredMin)
-assert xPredMax <= 1, "Uh-oh! The highest value in xPred is %.4f!" % (xPredMax)
-print("Yay! All of the values in xPred were correctly bounded to the range [0, 1]!")
+x_pred_min = min(x_pred)
+x_pred_max = max(x_pred)
+
+assert x_pred_min >= 0, "Uh-oh! The lowest value in x_pred is %.4f!" % (x_pred_min)
+
+assert x_pred_max <= 1, "Uh-oh! The highest value in x_pred is %.4f!" % (x_pred_max)
+
+print("Yay! All of the values in x_pred were correctly bounded to the range [0, 1]!")
 ```
